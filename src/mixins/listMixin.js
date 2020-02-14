@@ -154,6 +154,9 @@ export const listMixin = {
           }
         }
 
+        delete dataProvider.created_at
+        delete dataProvider.updated_at
+
         this.deleteLink = dataProvider.delete
         this.total = dataProvider.total
         this.from = dataProvider.from
@@ -507,6 +510,7 @@ export const listMixin = {
       this.insertUpdate(copyItem, true)
     },
     createFormData (item) {
+      console.log('item', item)
       const formData = new FormData()
       const object = {}
       const itemToUpdate = cloneItem(item)
@@ -515,6 +519,13 @@ export const listMixin = {
           let element = itemToUpdate[key]
           if (key === 'id' && element === '') {
             element = '0'
+          }
+          if (element === '') {
+            console.log('key', key)
+            continue
+          }
+          if (key === 'fornitore') {
+            element = 'user'
           }
           if (typeof element === 'object' && !key.includes('data')) {
             if (element) {
@@ -634,6 +645,8 @@ export const listMixin = {
       if (copy) {
         item.copy = '1'
       }
+      delete item.created_at
+      delete item.updated_at
       item.module_tab_id = this.module.id
       console.log(item)
       try {

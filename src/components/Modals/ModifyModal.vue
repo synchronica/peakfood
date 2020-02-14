@@ -69,24 +69,8 @@
             <template v-for="({field, type, action, helperText, parameters, className, is_disabled}) in localFields">
               <b-col v-if="isHidden(type)" class="mb-3" sm="12" :class="className" :key="field">
                 <label>{{ capitalize(field) }}</label>
-                <editor
-                  v-if="type === 'editor'"
-                  api-key="u3kd7cx86c40gx934ekz9c06iqfgizdv7uugor4urs2eoutw"
-                  v-model="modifiedItem[field]"
-                  :init="{
-                    menubar: false,
-                    plugins: [
-                      'advlist autolink lists link image charmap print preview anchor',
-                      'searchreplace visualblocks code fullscreen',
-                      'insertdatetime media table paste code help wordcount'
-                    ],
-                    toolbar:
-                      'undo redo | formatselect | bold italic backcolor | \
-                      alignleft aligncenter alignright alignjustify | \
-                      bullist numlist outdent indent | removeformat | help'
-                  }" />
 
-                <b-form-input v-else-if="type === 'text'" v-model="modifiedItem[field]" :disabled="is_disabled === '1'"/>
+                <b-form-input v-if="type === 'text'" v-model="modifiedItem[field]" :disabled="is_disabled === '1'"/>
                 <b-form-input v-else-if="type === 'float'" v-model="modifiedItem[field]" :disabled="is_disabled === '1'"/>
                 <b-form-input v-else-if="type === 'number'" type="number" v-model="modifiedItem[field]" :disabled="is_disabled === '1'"/>
 
@@ -175,7 +159,6 @@ import { selectFilterMixin } from '@/mixins/selectFilterMixin'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-import Editor from '@tinymce/tinymce-vue'
 
 import { quillEditor } from 'vue-quill-editor'
 
@@ -185,8 +168,7 @@ export default {
   components: {
     vSelect,
     Switches,
-    quillEditor,
-    Editor
+    quillEditor
   },
   data: () => ({
     modifiedItem: null,
