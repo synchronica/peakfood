@@ -61,10 +61,10 @@ export default {
       commit('clearError')
       commit('setProcessing', true)
       let formData = new FormData()
-      // formData.set('email', payload.email)
-      // formData.set('password', payload.password)
-      formData.set('email', 'aabavaja@aaaa.it')
-      formData.set('password', 'aaaaa')
+      formData.set('email', payload.email)
+      formData.set('password', payload.password)
+      // formData.set('email', 'aabavaja@aaaa.it')
+      // formData.set('password', 'aaaaa')
 
       try {
         const response = await instance.post('/api/auth/login', formData)
@@ -80,6 +80,7 @@ export default {
         const { user } = response.data.success
         localStorage.setItem('user', JSON.stringify(user))
         commit('setUser', user)
+        location.reload()
       } catch (error) {
         console.log(error)
       }

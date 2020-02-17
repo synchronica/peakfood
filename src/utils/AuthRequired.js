@@ -3,7 +3,7 @@ import userStore from '@/store/modules/user'
 export default (to, from, next) => {
   const currentUser = userStore.state.currentUser ? userStore.state.currentUser : localStorage.getItem('user')
 
-  if (currentUser !== null) {
+  if (currentUser) {
     next()
   } else {
     localStorage.removeItem('user')

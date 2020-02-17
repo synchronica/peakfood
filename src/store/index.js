@@ -5,6 +5,8 @@ import { instance } from '@/axiosInstance'
 import app from '../main'
 import menu from './modules/menu'
 import user from './modules/user'
+import router from '@/router'
+
 // import chat from './modules/chat'
 // import todo from './modules/todo'
 // import survey from './modules/survey'
@@ -146,6 +148,12 @@ export const store = new Vuex.Store({
           console.log('rootState', rootState)
           if (rootState.user.currentUser) {
             dispatch('getNavigation')
+          } else {
+            console.log('r', router)
+            if (router.history.current.path !== '/user/login') {
+              router.push('/user/login')
+            }
+            commit('SET_INIT_IS_LOAD', true)
           }
 
           // dispatch('getNavigation', { protocol, host })
