@@ -225,22 +225,22 @@
   </b-row>
 </template>
 <script>
-import { DataListIcon, ThumbListIcon, ImageListIcon } from "@/components/Svg";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+import { DataListIcon, ThumbListIcon, ImageListIcon } from '@/components/Svg'
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
 
-import FoodCostListItem from "@/components/Listing/FoodCostListItem";
-import { listMixin } from "@/mixins/listMixin";
-import axios from "axios";
+import FoodCostListItem from '@/components/Listing/FoodCostListItem'
+import { listMixin } from '@/mixins/listMixin'
+import axios from 'axios'
 
-import Switches from "vue-switches";
-import InputTag from "@/components/Form/InputTag";
-import CreateModal from "@/components/Modals/CreateModal";
-import ModifyModal from "@/components/Modals/ModifyModal";
-import { instance } from "@/axiosInstance";
+import Switches from 'vue-switches'
+import InputTag from '@/components/Form/InputTag'
+import CreateModal from '@/components/Modals/CreateModal'
+import ModifyModal from '@/components/Modals/ModifyModal'
+import { instance } from '@/axiosInstance'
 
 export default {
-  props: ["parent"],
+  props: ['parent'],
   mixins: [listMixin],
   components: {
     FoodCostListItem,
@@ -252,28 +252,28 @@ export default {
     InputTag,
     ModifyModal,
     CreateModal,
-    FilterModal: () => import("@/components/Modals/FilterModal"),
-    DistintaBaseModal: () => import("@/components/Modals/DistintaBaseModal")
+    FilterModal: () => import('@/components/Modals/FilterModal'),
+    DistintaBaseModal: () => import('@/components/Modals/DistintaBaseModal')
   },
-  data() {
+  data () {
     return {
       moduleId: null,
       modifyModalShow: false,
       dibaId: null,
       dibaItem: null,
-      ascValue: "DESC",
-      ascOptions: ["ASC", "DESC"],
+      ascValue: 'DESC',
+      ascOptions: ['ASC', 'DESC'],
       fieldsManager: [],
       dataProvider: [],
       isLoad: false,
-      apiBase: "",
-      displayMode: "list",
+      apiBase: '',
+      displayMode: 'list',
       displayModeOptions: [],
-      filter: "Tutti",
-      sort: { column: "id", label: "ID" },
+      filter: 'Tutti',
+      sort: { column: 'id', label: 'ID' },
       page: 1,
       perPage: 20,
-      search: "",
+      search: '',
       from: 0,
       to: 0,
       total: 0,
@@ -288,209 +288,212 @@ export default {
       selectOptions: [],
       favorites: [],
       filterForm: {}
-    };
+    }
   },
   computed: {
-    foodCostNav() {
+    foodCostNav () {
       return this.$store.state.navigation.find(link =>
-        link.name.includes("Food Cost")
-      );
+        link.name.includes('Food Cost')
+      )
     }
   },
   methods: {
-    handleFilter(route) {
-      let query = route.slice(route.indexOf("?") + 1).split("=");
+    handleFilter (route) {
+      let query = route.slice(route.indexOf('?') + 1).split('=')
       query = {
         categoria_ricetta: query[1]
-      };
+      }
 
-      if (query.categoria_ricetta === "Tutti") {
-        this.filterQuery = "";
-        this.loadItems();
+      if (query.categoria_ricetta === 'Tutti') {
+        this.filterQuery = ''
+        this.loadItems()
       } else {
-        this.loadItems(query);
+        this.loadItems(query)
       }
-      this.filter = query.categoria_ricetta;
+      this.filter = query.categoria_ricetta
 
-      console.log(query);
+      console.log(query)
     },
-    log() {
-      console.log("clicked");
+    log () {
+      console.log('clicked')
     },
-    handleFavorite(item) {
-      console.log("item", item);
-      if (item.favorite === "0") {
-        item.favorite = "1";
+    handleFavorite (item) {
+      console.log('item', item)
+      if (item.favorite === '0') {
+        item.favorite = '1'
       } else {
-        item.favorite = "0";
+        item.favorite = '0'
       }
-      this.modifiedItem = item;
-      this.updateItem(this.modifiedItem);
-    },
-    async loadItems(paramQuery) {
-      this.isLoad = false;
-      if (paramQuery) {
-        for (const key in paramQuery) {
-          if (paramQuery.hasOwnProperty(key)) {
-            this.filterQuery += "&";
-            this.filterQuery += key + "=" + paramQuery[key];
-          }
-        }
-        console.log("query", this.filterQuery);
-      }
-      // const fieldsManagerEndpoint = `${this.apiUrl}&fields_manager=${this.module.id}&token=1`
-      // const dataProviderEndpoint = `${this.apiUrl}&data_provider=${this.module.id}&token=1${this.filterQuery ? '&filters' + this.filterQuery : ''}`
-      let formData = new FormData();
-      formData.set("fields_manager", this.module.id);
-      formData.set("data_provider", this.module.id);
-      try {
-        const fieldManagerResponse = await instance.post(
-          "/api/FieldsManager",
-          formData
-        );
-        console.log("fieldManagerResponse", fieldManagerResponse);
-        this.fieldsManager = [];
-        this.fieldsManager = fieldManagerResponse.data.data;
-        let newItem = {};
-        let filterForm = {};
-        this.fieldsManager.forEach(field => {
-          if (field.type === "date") {
-            newItem[field.field] = new Date();
-          } else if (field.type === "tags") {
-            newItem[field.field] = [];
-          } else {
-            newItem[field.field] = "";
-          }
-
-          if (
-            field.type === "tags" ||
-            field.type === "select" ||
-            field.type === "selectText" ||
-            field.type === "hiddenSelect"
-          ) {
-            this.getSelectOptions(field.field, field.type);
-          }
-
-          if (Number(field.in_filter) > 0) {
-            filterForm[field.field] = "";
-          }
-        });
-        this.newItem = newItem;
-        this.filterForm = filterForm;
-      } catch (error) {
-        console.log(error);
-      }
-
-      try {
-        const dataProviderResponse = await instance.post(
-          "/api/DataProvider",
-          formData
-        );
-        console.log("dataProviderResponse", dataProviderResponse);
-        const dataProvider = dataProviderResponse.data.data;
-
-        if (!dataProvider) {
-          const error = {
-            message: "Empty"
-          };
-          throw error;
-        }
-
-        for (let index = 0; index < dataProvider.length; index++) {
-          const item = dataProvider[index];
-          if (item.allergeni) {
-            if (item.allergeni === "") {
-              dataProvider[index].allergeni = await [];
-            } else {
-              dataProvider[index].allergeni = await item.allergeni
-                .replace(/[{}]+/g, "")
-                .split(",");
-            }
-          }
-        }
-
-        this.deleteLink = dataProvider.delete;
-        this.total = dataProvider.total;
-        this.from = dataProvider.from;
-        this.to = dataProvider.to;
-        this.items = dataProvider;
-        this.perPage = dataProvider.per_page;
-        this.selectedItems = [];
-        this.lastPage = dataProvider.last_page;
-        this.isLoad = true;
-        this.hideModal("filtermodal");
-      } catch (error) {
-        this.isLoad = true;
-        console.log(error);
-      }
-
-      // instance.all([
-      //   axios.get(fieldsManagerEndpoint),
-      //   axios.get(dataProviderEndpoint)
-      // ])
-      //   .then(responseArr => {
-      //     this.fieldsManager = []
-      //     this.fieldsManager = responseArr[0].data.data
-      //     console.log('fieldsManagerResponse', responseArr[0])
-      //     let newItem = {}
-      //     let filterForm = {}
-      //     this.fieldsManager.forEach(field => {
-      //       if (field.type === 'date') {
-      //         newItem[field.field] = new Date()
-      //       } else if (field.type === 'tags') {
-      //         newItem[field.field] = []
-      //       } else {
-      //         newItem[field.field] = ''
-      //       }
-
-      //       if (field.type === 'tags' || field.type === 'select' || field.type === 'selectText' || field.type === 'hiddenSelect') {
-      //         this.getSelectOptions(field.field, field.type)
-      //       }
-
-      //       if (Number(field.in_filter) > 0) {
-      //         filterForm[field.field] = ''
-      //       }
-      //     })
-      //     this.newItem = newItem
-      //     this.filterForm = filterForm
-      //     return responseArr[1]
-      //   })
-      //   .then(async response => {
-      //     let data = response.data
-      //     const dataProvider = data.data
-      //     console.log('dataProviderResponse', response)
-
-      //     for (let index = 0; index < dataProvider.length; index++) {
-      //       const item = dataProvider[index]
-      //       if (item.allergeni) {
-      //         if (item.allergeni === '') {
-      //           data.data[index].allergeni = await []
-      //         } else {
-      //           data.data[index].allergeni = await item.allergeni.replace(/[{}]+/g, '').split(',')
-      //         }
-      //       }
-      //     }
-      //     return data
-      //   })
-      //   .then(data => {
-      //     this.deleteLink = data.delete
-      //     this.total = data.total
-      //     this.from = data.from
-      //     this.to = data.to
-      //     this.items = data.data
-      //     this.perPage = data.per_page
-      //     this.selectedItems = []
-      //     this.lastPage = data.last_page
-      //     this.isLoad = true
-      //     this.hideModal('filtermodal')
-      //   })
-      //   .catch(error => {
-      //     this.isLoad = true
-      //     console.log(error)
-      //   })
+      this.modifiedItem = item
+      this.updateItem(this.modifiedItem)
     }
+    // async loadItems (paramQuery) {
+    //   this.isLoad = false
+    //   if (paramQuery) {
+    //     for (const key in paramQuery) {
+    //       if (paramQuery.hasOwnProperty(key)) {
+    //         this.filterQuery += '&'
+    //         this.filterQuery += key + '=' + paramQuery[key]
+    //       }
+    //     }
+    //     console.log('query', this.filterQuery)
+    //   }
+    //   // const fieldsManagerEndpoint = `${this.apiUrl}&fields_manager=${this.module.id}&token=1`
+    //   // const dataProviderEndpoint = `${this.apiUrl}&data_provider=${this.module.id}&token=1${this.filterQuery ? '&filters' + this.filterQuery : ''}`
+    //   let formData = new FormData()
+    //   formData.set('fields_manager', this.module.id)
+    //   formData.set('data_provider', this.module.id)
+    //   try {
+    //     const fieldManagerResponse = await instance.post(
+    //       '/api/FieldsManager',
+    //       formData
+    //     )
+    //     console.log('fieldManagerResponse', fieldManagerResponse)
+    //     this.fieldsManager = []
+    //     this.fieldsManager = fieldManagerResponse.data.data
+    //     let newItem = {}
+    //     let filterForm = {}
+    //     this.fieldsManager.forEach(field => {
+    //       if (field.type === 'date') {
+    //         newItem[field.field] = new Date()
+    //       } else if (field.type === 'tags') {
+    //         newItem[field.field] = []
+    //       } else {
+    //         newItem[field.field] = ''
+    //       }
+
+    //       if (
+    //         field.type === 'tags' ||
+    //         field.type === 'select' ||
+    //         field.type === 'selectText' ||
+    //         field.type === 'hiddenSelect'
+    //       ) {
+    //         this.getSelectOptions(field.field, field.type)
+    //       }
+
+    //       if (Number(field.in_filter) > 0) {
+    //         filterForm[field.field] = ''
+    //       }
+    //     })
+    //     this.newItem = newItem
+    //     this.filterForm = filterForm
+    //   } catch (error) {
+    //     console.log(error)
+    //   }
+
+    //   try {
+    //     const dataProviderResponse = await instance.post(
+    //       '/api/DataProvider',
+    //       formData
+    //     )
+    //     console.log('dataProviderResponse', dataProviderResponse)
+    //     const dataProvider = dataProviderResponse.data.data
+    //     const { data } = dataProviderResponse
+
+    //     console.log('data', data)
+
+    //     if (!dataProvider) {
+    //       const error = {
+    //         message: 'Empty'
+    //       }
+    //       throw error
+    //     }
+
+    //     for (let index = 0; index < dataProvider.length; index++) {
+    //       const item = dataProvider[index]
+    //       if (item.allergeni) {
+    //         if (item.allergeni === '') {
+    //           dataProvider[index].allergeni = await []
+    //         } else {
+    //           dataProvider[index].allergeni = await item.allergeni
+    //             .replace(/[{}]+/g, '')
+    //             .split(',')
+    //         }
+    //       }
+    //     }
+
+    //     this.deleteLink = data.delete
+    //     this.total = data.total
+    //     this.from = data.from
+    //     this.to = data.to
+    //     this.items = dataProvider
+    //     this.perPage = data.per_page
+    //     this.selectedItems = []
+    //     this.lastPage = data.last_page
+    //     this.isLoad = true
+    //     this.hideModal('filtermodal')
+    //   } catch (error) {
+    //     this.isLoad = true
+    //     console.log(error)
+    //   }
+
+    //   // instance.all([
+    //   //   axios.get(fieldsManagerEndpoint),
+    //   //   axios.get(dataProviderEndpoint)
+    //   // ])
+    //   //   .then(responseArr => {
+    //   //     this.fieldsManager = []
+    //   //     this.fieldsManager = responseArr[0].data.data
+    //   //     console.log('fieldsManagerResponse', responseArr[0])
+    //   //     let newItem = {}
+    //   //     let filterForm = {}
+    //   //     this.fieldsManager.forEach(field => {
+    //   //       if (field.type === 'date') {
+    //   //         newItem[field.field] = new Date()
+    //   //       } else if (field.type === 'tags') {
+    //   //         newItem[field.field] = []
+    //   //       } else {
+    //   //         newItem[field.field] = ''
+    //   //       }
+
+    //   //       if (field.type === 'tags' || field.type === 'select' || field.type === 'selectText' || field.type === 'hiddenSelect') {
+    //   //         this.getSelectOptions(field.field, field.type)
+    //   //       }
+
+    //   //       if (Number(field.in_filter) > 0) {
+    //   //         filterForm[field.field] = ''
+    //   //       }
+    //   //     })
+    //   //     this.newItem = newItem
+    //   //     this.filterForm = filterForm
+    //   //     return responseArr[1]
+    //   //   })
+    //   //   .then(async response => {
+    //   //     let data = response.data
+    //   //     const dataProvider = data.data
+    //   //     console.log('dataProviderResponse', response)
+
+    //   //     for (let index = 0; index < dataProvider.length; index++) {
+    //   //       const item = dataProvider[index]
+    //   //       if (item.allergeni) {
+    //   //         if (item.allergeni === '') {
+    //   //           data.data[index].allergeni = await []
+    //   //         } else {
+    //   //           data.data[index].allergeni = await item.allergeni.replace(/[{}]+/g, '').split(',')
+    //   //         }
+    //   //       }
+    //   //     }
+    //   //     return data
+    //   //   })
+    //   //   .then(data => {
+    //   //     this.deleteLink = data.delete
+    //   //     this.total = data.total
+    //   //     this.from = data.from
+    //   //     this.to = data.to
+    //   //     this.items = data.data
+    //   //     this.perPage = data.per_page
+    //   //     this.selectedItems = []
+    //   //     this.lastPage = data.last_page
+    //   //     this.isLoad = true
+    //   //     this.hideModal('filtermodal')
+    //   //   })
+    //   //   .catch(error => {
+    //   //     this.isLoad = true
+    //   //     console.log(error)
+    //   //   })
+    // }
   }
-};
+}
 </script>
 
 <style>

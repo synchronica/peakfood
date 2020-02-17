@@ -133,6 +133,8 @@ export const listMixin = {
         )
         console.log('dataProviderResponse', dataProviderResponse)
         const dataProvider = dataProviderResponse.data.data
+        const { data } = dataProviderResponse
+        console.log('data', data)
 
         if (!dataProvider) {
           const error = {
@@ -157,14 +159,14 @@ export const listMixin = {
         delete dataProvider.created_at
         delete dataProvider.updated_at
 
-        this.deleteLink = dataProvider.delete
-        this.total = dataProvider.total
-        this.from = dataProvider.from
-        this.to = dataProvider.to
+        this.deleteLink = data.delete
+        this.total = data.total
+        this.from = data.from
+        this.to = data.to
         this.items = dataProvider
-        this.perPage = dataProvider.per_page
+        this.perPage = data.per_page
         this.selectedItems = []
-        this.lastPage = dataProvider.last_page
+        this.lastPage = data.last_page
         this.isLoad = true
         this.hideModal('filtermodal')
       } catch (error) {
@@ -429,13 +431,14 @@ export const listMixin = {
         ids.push(id)
       }
       const formData = new FormData()
+      formData.set('delete', this.moduleId)
       ids.forEach((val, index) => {
         formData.set(`ids[${index}]`, val)
       })
       if (ids.length > 0) {
         try {
           const response = await instance.post(
-            '/api/Delete',
+            '/api/DeleteItem',
             formData
           )
           console.log('deleteResponse', response)
@@ -517,11 +520,20 @@ export const listMixin = {
       for (const key in itemToUpdate) {
         if (itemToUpdate.hasOwnProperty(key)) {
           let element = itemToUpdate[key]
+          if (typeof element === 'boolean') {
+            element = String(element)
+            if (element === 'true') {
+              element = '1'
+            } else {
+              element = '0'
+            }
+            console.log('bool', element)
+          }
           if (key === 'id' && element === '') {
             element = '0'
           }
           if (element === '') {
-            console.log('key', key)
+            // console.log('key', key)
             continue
           }
           if (key === 'fornitore') {
@@ -837,7 +849,7 @@ export const listMixin = {
       this.isLoad = false
       this.moduleId = this.$route.params.id
       this.$store.dispatch('getModuleManager', this.moduleId)
-      this.apiBase = 'https://' + this.$store.getters.getHost + '/v3.0/'
+      // this.apiBase = 'https://' + this.$store.getters.getHost + '/v3.0/'
     },
     module () {
       if (this.initIsLoad && this.module) {
@@ -853,16 +865,16 @@ export const listMixin = {
           this.loadItems()
         }
       }
-    },
-    apiUrl () {
-      if (this.initIsLoad && this.isLoad) {
-        this.loadItems()
-      }
     }
+    // apiUrl () {
+    //   if (this.initIsLoad && this.isLoad) {
+    //     this.loadItems()
+    //   }
+    // }
   },
   created () {
     this.moduleId = this.$route.params.id
     this.$store.dispatch('getModuleManager', this.moduleId)
-    this.apiBase = 'https://' + this.$store.getters.getHost + '/v3.0/'
+    // this.apiBase = 'https://' + this.$store.getters.getHost + '/v3.0/'
   }
 }
