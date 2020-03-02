@@ -6,19 +6,6 @@
 
         <template v-for="(field, index) in fields">
 
-          <!-- BADGE WITH ICON AND LINK -->
-          <div v-if="Number(field.in_list) > 0 && field.background && field.action === 'fileOpen' && field.link !== '{link}'" class=" w-sm-100" :class="`w-${columnWith}`" :key="index">
-            <a
-              target="_blank"
-              :href="hrefLink(field.link, data.protocollo_file, data.tipo_di_file)"
-              class="badge badge-pill"
-              :style="{ background: field.background, color: (field.color ? field.color : 'white') }"
-              :key="field.field"
-            >
-              <i :class="`mr-1 glyph-icon ${field.icon ? field.icon : 'simple-icon-cloud-download'}`"/> <span v-html="decodeHTML(data[field.field])" />
-            </a>
-          </div>
-
           <!-- BADGE WITH ICON AND EXTERNAL LINK -->
           <div v-if="Number(field.in_list) > 0 && field.background && field.link === '{link}'" class=" w-sm-100" :class="`w-${columnWith}`" :key="index">
             <a
@@ -86,19 +73,6 @@ export default {
     },
     modifyItem (event, item) {
       this.$emit('modify-item', event, item)
-    },
-    hrefLink (link, protocolloFile, fileType) {
-      if (!link) {
-        console.log('No link', protocolloFile)
-      }
-
-      let originalLink = link || ''
-      let linkFormatted = originalLink.replace('{protocollo_file}', protocolloFile)
-      linkFormatted = fileType ? linkFormatted.replace('{tipo_di_file}', fileType.toLowerCase()) : linkFormatted
-      const protocol = location.protocol
-      const host = location.hostname
-      const entryPoint = process.env.NODE_ENV === 'production' ? protocol + '//' + host + '/' : 'https://peakfood.condivision.cloud/'
-      return entryPoint + linkFormatted
     },
     filterOptions (id) {
       // console.log('id', typeof id)

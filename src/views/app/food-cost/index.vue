@@ -10,7 +10,8 @@
               variant="primary"
               size="lg"
               class="top-right-button"
-            >{{ $t('pages.add-new') }}</b-button>
+              >{{ $t("pages.add-new") }}</b-button
+            >
             <b-button-group>
               <b-dropdown
                 split
@@ -27,17 +28,19 @@
                     class="custom-control-input"
                     type="checkbox"
                     :checked="isSelectedAll"
-                    v-shortkey="{select: ['ctrl','a'], undo: ['ctrl','d']}"
+                    v-shortkey="{ select: ['ctrl', 'a'], undo: ['ctrl', 'd'] }"
                     @shortkey="keymap"
                   />
                   <span
                     :class="{
-                'custom-control-label' :true,
-                'indeterminate' : isAnyItemSelected
-              }"
+                      'custom-control-label': true,
+                      indeterminate: isAnyItemSelected
+                    }"
                   />
                 </label>
-                <b-dropdown-item @click="multipleDeletes">{{$t('pages.delete')}}</b-dropdown-item>
+                <b-dropdown-item @click="multipleDeletes">{{
+                  $t("pages.delete")
+                }}</b-dropdown-item>
               </b-dropdown>
             </b-button-group>
           </div>
@@ -49,7 +52,7 @@
               class="pt-0 pl-0 d-inline-block d-md-none"
               v-b-toggle.displayOptions
             >
-              {{ $t('pages.display-options') }}
+              {{ $t("pages.display-options") }}
               <i class="simple-icon-arrow-down align-middle" />
             </b-button>
             <b-collapse id="displayOptions" class="d-md-block">
@@ -60,19 +63,31 @@
                 >
                   <template v-for="option in displayModeOptions">
                     <a
-                      :class="{'mr-2 view-icon':true,'active': displayMode===option}"
+                      :class="{
+                        'mr-2 view-icon': true,
+                        active: displayMode === option
+                      }"
                       @click="changeDisplayMode(option)"
                       :key="option"
                     >
-                      <component v-bind:is="(option === 'list' ? 'data': option) + '-list-icon'" />
+                      <component
+                        v-bind:is="
+                          (option === 'list' ? 'data' : option) + '-list-icon'
+                        "
+                      />
                     </a>
                   </template>
                 </span>
-                <div class="search-sm d-inline-block float-md-left mr-1 align-top mb-2">
-                  <b-input :placeholder="$t('menu.search')" v-model.lazy="search" />
+                <div
+                  class="search-sm d-inline-block float-md-left mr-1 align-top mb-2"
+                >
+                  <b-input
+                    :placeholder="$t('menu.search')"
+                    v-model.lazy="search"
+                  />
                 </div>
 
-                <b-dropdown
+                <!-- <b-dropdown
                   id="ddown5"
                   :text="`${filter}`"
                   size="xs"
@@ -84,10 +99,36 @@
                     @click="handleFilter(sub_route)"
                     :key="`sub-${sub_name}`"
                   >{{ sub_name }}</b-dropdown-item>
-                </b-dropdown>
+                </b-dropdown> -->
+
+                <template
+                  v-for="{ sub_name, sub_route } in foodCostNav.nav_sub"
+                >
+                  <b-btn
+                    v-if="sub_name === filter"
+                    class="no-border mr-1"
+                    variant="primary"
+                    size="xs"
+                    @click="handleFilter(sub_route)"
+                    :key="`sub-${sub_name}`"
+                    >{{ sub_name }}</b-btn
+                  >
+
+                  <b-btn
+                    v-else
+                    class="mr-1"
+                    variant="outline-secondary"
+                    size="xs"
+                    @click="handleFilter(sub_route)"
+                    :key="`sub-${sub_name}`"
+                    >{{ sub_name }}</b-btn
+                  >
+                </template>
 
                 <div class="d-inline-block d-md-none">
-                  <span class="text-muted text-small mr-1 mb-2">{{from}}-{{to}} of {{ total }}</span>
+                  <span class="text-muted text-small mr-1 mb-2"
+                    >{{ from }}-{{ to }} of {{ total }}</span
+                  >
                   <b-dropdown
                     id="ddown2"
                     right
@@ -97,15 +138,18 @@
                     size="xs"
                   >
                     <b-dropdown-item
-                      v-for="(size,index) in pageSizes"
+                      v-for="(size, index) in pageSizes"
                       :key="index"
                       @click="changePageSize(size)"
-                    >{{ size }}</b-dropdown-item>
+                      >{{ size }}</b-dropdown-item
+                    >
                   </b-dropdown>
                 </div>
               </div>
               <div class="float-md-right d-none d-md-block">
-                <span class="text-muted text-small mr-1 mb-2">{{from}}-{{to}} of {{ total }}</span>
+                <span class="text-muted text-small mr-1 mb-2"
+                  >{{ from }}-{{ to }} of {{ total }}</span
+                >
                 <b-dropdown
                   id="ddown2"
                   right
@@ -115,10 +159,11 @@
                   size="xs"
                 >
                   <b-dropdown-item
-                    v-for="(size,index) in pageSizes"
+                    v-for="(size, index) in pageSizes"
                     :key="index"
                     @click="changePageSize(size)"
-                  >{{ size }}</b-dropdown-item>
+                    >{{ size }}</b-dropdown-item
+                  >
                 </b-dropdown>
               </div>
             </b-collapse>
@@ -159,7 +204,7 @@
           </template>
         </b-row>
 
-        <b-row v-if="lastPage>1">
+        <b-row v-if="lastPage > 1">
           <b-colxx xxs="12">
             <b-pagination-nav
               :number-of-pages="lastPage"
@@ -188,7 +233,9 @@
         <div class="loading"></div>
       </template>
       <template v-else-if="items.length < 1">
-        <b-container class="d-flex h-100 flex-column justify-content-center align-items-center">
+        <b-container
+          class="d-flex h-100 flex-column justify-content-center align-items-center"
+        >
           <i style="font-size: 40px;" class="simple-icon-close text-muted" />
           <h1 class="text-muted">Nessun elemento trovato</h1>
         </b-container>
@@ -221,26 +268,30 @@
       @modify-submit="updateItem"
       @hide-modal="hideModal"
     />
-    <distinta-base-modal :id="dibaId" :item="dibaItem" @update-diba-field="insertUpdate" />
+    <distinta-base-modal
+      :id="dibaId"
+      :item="dibaItem"
+      @update-diba-field="insertUpdate"
+    />
   </b-row>
 </template>
 <script>
-import { DataListIcon, ThumbListIcon, ImageListIcon } from '@/components/Svg'
-import vSelect from 'vue-select'
-import 'vue-select/dist/vue-select.css'
+import { DataListIcon, ThumbListIcon, ImageListIcon } from "@/components/Svg";
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
 
-import FoodCostListItem from '@/components/Listing/FoodCostListItem'
-import { listMixin } from '@/mixins/listMixin'
-import axios from 'axios'
+import FoodCostListItem from "@/components/Listing/FoodCostListItem";
+import { listMixin } from "@/mixins/listMixin";
+import axios from "axios";
 
-import Switches from 'vue-switches'
-import InputTag from '@/components/Form/InputTag'
-import CreateModal from '@/components/Modals/CreateModal'
-import ModifyModal from '@/components/Modals/ModifyModal'
-import { instance } from '@/axiosInstance'
+import Switches from "vue-switches";
+import InputTag from "@/components/Form/InputTag";
+import CreateModal from "@/components/Modals/CreateModal";
+import ModifyModal from "@/components/Modals/ModifyModal";
+import { instance } from "@/axiosInstance";
 
 export default {
-  props: ['parent'],
+  props: ["parent"],
   mixins: [listMixin],
   components: {
     FoodCostListItem,
@@ -252,28 +303,28 @@ export default {
     InputTag,
     ModifyModal,
     CreateModal,
-    FilterModal: () => import('@/components/Modals/FilterModal'),
-    DistintaBaseModal: () => import('@/components/Modals/DistintaBaseModal')
+    FilterModal: () => import("@/components/Modals/FilterModal"),
+    DistintaBaseModal: () => import("@/components/Modals/DistintaBaseModal")
   },
-  data () {
+  data() {
     return {
       moduleId: null,
       modifyModalShow: false,
       dibaId: null,
       dibaItem: null,
-      ascValue: 'DESC',
-      ascOptions: ['ASC', 'DESC'],
+      ascValue: "DESC",
+      ascOptions: ["ASC", "DESC"],
       fieldsManager: [],
       dataProvider: [],
       isLoad: false,
-      apiBase: '',
-      displayMode: 'list',
+      apiBase: "",
+      displayMode: "list",
       displayModeOptions: [],
-      filter: 'Tutti',
-      sort: { column: 'id', label: 'ID' },
+      filter: "Tutti",
+      sort: { column: "id", label: "ID" },
       page: 1,
       perPage: 20,
-      search: '',
+      search: "",
       from: 0,
       to: 0,
       total: 0,
@@ -288,212 +339,70 @@ export default {
       selectOptions: [],
       favorites: [],
       filterForm: {}
-    }
+    };
   },
   computed: {
-    foodCostNav () {
+    foodCostNav() {
       return this.$store.state.navigation.find(link =>
-        link.name.includes('Food Cost')
-      )
+        link.name.includes("Food Cost")
+      );
     }
   },
   methods: {
-    handleFilter (route) {
-      let query = route.slice(route.indexOf('?') + 1).split('=')
+    handleFilter(route) {
+      let query = route.slice(route.indexOf("?") + 1).split("=");
       query = {
         categoria_ricetta: query[1]
-      }
+      };
 
-      if (query.categoria_ricetta === 'Tutti') {
-        this.filterQuery = ''
-        this.loadItems()
+      if (query.categoria_ricetta === "Tutti") {
+        this.filterQuery = "";
+        this.loadItems();
       } else {
-        this.loadItems(query)
+        this.loadItems(query);
       }
-      this.filter = query.categoria_ricetta
+      this.filter = query.categoria_ricetta;
 
-      console.log(query)
+      console.log(query);
     },
-    log () {
-      console.log('clicked')
+    log() {
+      console.log("clicked");
     },
-    handleFavorite (item) {
-      console.log('item', item)
-      if (item.favorite === '0') {
-        item.favorite = '1'
+    handleFavorite(item) {
+      console.log("item", item);
+      if (item.favorite === "0") {
+        item.favorite = "1";
       } else {
-        item.favorite = '0'
+        item.favorite = "0";
       }
-      this.modifiedItem = item
-      this.updateItem(this.modifiedItem)
+      this.modifiedItem = item;
+      this.updateItem(this.modifiedItem);
+    },
+    async deleteItem(id) {
+      let ids = [...this.selectedItems];
+      if (id) {
+        ids.push(id);
+      }
+      const formData = new FormData();
+      formData.set("delete", this.$store.state.modulesManager.module_tab_id);
+      ids.forEach((val, index) => {
+        formData.set(`ids[${index}]`, val);
+      });
+      if (ids.length > 0) {
+        try {
+          const response = await this.axios.post("/api/DeleteItem", formData);
+          console.log("deleteResponse", response);
+          this.items = this.items.filter(item => {
+            return ids.indexOf(item.id) === -1;
+          });
+          this.selectedItems = [];
+        } catch (error) {
+          console.log(error);
+        }
+      }
     }
-    // async loadItems (paramQuery) {
-    //   this.isLoad = false
-    //   if (paramQuery) {
-    //     for (const key in paramQuery) {
-    //       if (paramQuery.hasOwnProperty(key)) {
-    //         this.filterQuery += '&'
-    //         this.filterQuery += key + '=' + paramQuery[key]
-    //       }
-    //     }
-    //     console.log('query', this.filterQuery)
-    //   }
-    //   // const fieldsManagerEndpoint = `${this.apiUrl}&fields_manager=${this.module.id}&token=1`
-    //   // const dataProviderEndpoint = `${this.apiUrl}&data_provider=${this.module.id}&token=1${this.filterQuery ? '&filters' + this.filterQuery : ''}`
-    //   let formData = new FormData()
-    //   formData.set('fields_manager', this.module.id)
-    //   formData.set('data_provider', this.module.id)
-    //   try {
-    //     const fieldManagerResponse = await instance.post(
-    //       '/api/FieldsManager',
-    //       formData
-    //     )
-    //     console.log('fieldManagerResponse', fieldManagerResponse)
-    //     this.fieldsManager = []
-    //     this.fieldsManager = fieldManagerResponse.data.data
-    //     let newItem = {}
-    //     let filterForm = {}
-    //     this.fieldsManager.forEach(field => {
-    //       if (field.type === 'date') {
-    //         newItem[field.field] = new Date()
-    //       } else if (field.type === 'tags') {
-    //         newItem[field.field] = []
-    //       } else {
-    //         newItem[field.field] = ''
-    //       }
-
-    //       if (
-    //         field.type === 'tags' ||
-    //         field.type === 'select' ||
-    //         field.type === 'selectText' ||
-    //         field.type === 'hiddenSelect'
-    //       ) {
-    //         this.getSelectOptions(field.field, field.type)
-    //       }
-
-    //       if (Number(field.in_filter) > 0) {
-    //         filterForm[field.field] = ''
-    //       }
-    //     })
-    //     this.newItem = newItem
-    //     this.filterForm = filterForm
-    //   } catch (error) {
-    //     console.log(error)
-    //   }
-
-    //   try {
-    //     const dataProviderResponse = await instance.post(
-    //       '/api/DataProvider',
-    //       formData
-    //     )
-    //     console.log('dataProviderResponse', dataProviderResponse)
-    //     const dataProvider = dataProviderResponse.data.data
-    //     const { data } = dataProviderResponse
-
-    //     console.log('data', data)
-
-    //     if (!dataProvider) {
-    //       const error = {
-    //         message: 'Empty'
-    //       }
-    //       throw error
-    //     }
-
-    //     for (let index = 0; index < dataProvider.length; index++) {
-    //       const item = dataProvider[index]
-    //       if (item.allergeni) {
-    //         if (item.allergeni === '') {
-    //           dataProvider[index].allergeni = await []
-    //         } else {
-    //           dataProvider[index].allergeni = await item.allergeni
-    //             .replace(/[{}]+/g, '')
-    //             .split(',')
-    //         }
-    //       }
-    //     }
-
-    //     this.deleteLink = data.delete
-    //     this.total = data.total
-    //     this.from = data.from
-    //     this.to = data.to
-    //     this.items = dataProvider
-    //     this.perPage = data.per_page
-    //     this.selectedItems = []
-    //     this.lastPage = data.last_page
-    //     this.isLoad = true
-    //     this.hideModal('filtermodal')
-    //   } catch (error) {
-    //     this.isLoad = true
-    //     console.log(error)
-    //   }
-
-    //   // instance.all([
-    //   //   axios.get(fieldsManagerEndpoint),
-    //   //   axios.get(dataProviderEndpoint)
-    //   // ])
-    //   //   .then(responseArr => {
-    //   //     this.fieldsManager = []
-    //   //     this.fieldsManager = responseArr[0].data.data
-    //   //     console.log('fieldsManagerResponse', responseArr[0])
-    //   //     let newItem = {}
-    //   //     let filterForm = {}
-    //   //     this.fieldsManager.forEach(field => {
-    //   //       if (field.type === 'date') {
-    //   //         newItem[field.field] = new Date()
-    //   //       } else if (field.type === 'tags') {
-    //   //         newItem[field.field] = []
-    //   //       } else {
-    //   //         newItem[field.field] = ''
-    //   //       }
-
-    //   //       if (field.type === 'tags' || field.type === 'select' || field.type === 'selectText' || field.type === 'hiddenSelect') {
-    //   //         this.getSelectOptions(field.field, field.type)
-    //   //       }
-
-    //   //       if (Number(field.in_filter) > 0) {
-    //   //         filterForm[field.field] = ''
-    //   //       }
-    //   //     })
-    //   //     this.newItem = newItem
-    //   //     this.filterForm = filterForm
-    //   //     return responseArr[1]
-    //   //   })
-    //   //   .then(async response => {
-    //   //     let data = response.data
-    //   //     const dataProvider = data.data
-    //   //     console.log('dataProviderResponse', response)
-
-    //   //     for (let index = 0; index < dataProvider.length; index++) {
-    //   //       const item = dataProvider[index]
-    //   //       if (item.allergeni) {
-    //   //         if (item.allergeni === '') {
-    //   //           data.data[index].allergeni = await []
-    //   //         } else {
-    //   //           data.data[index].allergeni = await item.allergeni.replace(/[{}]+/g, '').split(',')
-    //   //         }
-    //   //       }
-    //   //     }
-    //   //     return data
-    //   //   })
-    //   //   .then(data => {
-    //   //     this.deleteLink = data.delete
-    //   //     this.total = data.total
-    //   //     this.from = data.from
-    //   //     this.to = data.to
-    //   //     this.items = data.data
-    //   //     this.perPage = data.per_page
-    //   //     this.selectedItems = []
-    //   //     this.lastPage = data.last_page
-    //   //     this.isLoad = true
-    //   //     this.hideModal('filtermodal')
-    //   //   })
-    //   //   .catch(error => {
-    //   //     this.isLoad = true
-    //   //     console.log(error)
-    //   //   })
-    // }
   }
-}
+};
 </script>
 
 <style>
@@ -520,5 +429,10 @@ export default {
   top: calc(50%);
   position: fixed;
   z-index: 1;
+}
+
+#displayOptions .no-border {
+  border-color: #f18024;
+  color: #ffffff;
 }
 </style>

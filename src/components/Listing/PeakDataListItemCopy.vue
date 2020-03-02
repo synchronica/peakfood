@@ -43,18 +43,6 @@
               <i style="font-size: 24px" :class="`glyph-icon ${getIcon(data[field.field])}`"/>
             </div> -->
 
-            <!-- BADGE WITH ICON AND LINK -->
-            <div v-else-if="field.background && field.action === 'fileOpen' && field.link !== '{link}'" class="w-sm-100">
-              <a
-                target="_blank"
-                :href="hrefLink(field.link, data.protocollo_file, data.tipo_di_file)"
-                class="badge badge-pill"
-                :style="{ background: field.background, color: (field.color ? field.color : 'white') }"
-              >
-                <i :class="`mr-1 glyph-icon ${field.icon ? field.icon : 'simple-icon-cloud-download'}`"/> <span v-html="decodeHTML(data[field.field])" />
-              </a>
-            </div>
-
             <!-- BADGE WITH ICON AND EXTERNAL LINK -->
             <div v-else-if="field.background && field.link === '{link}'" class="w-sm-100">
               <a
@@ -235,28 +223,6 @@ export default {
     deleteItem () {},
     copyItem (event, item) {
       this.$emit('copy-item', event, item)
-    },
-
-    hrefLink (link, protocolloFile, fileType) {
-      if (!link) {
-        console.log('No link', protocolloFile)
-      }
-
-      let originalLink = link || ''
-      let linkFormatted = originalLink.replace(
-        '{protocollo_file}',
-        protocolloFile
-      )
-      linkFormatted = fileType
-        ? linkFormatted.replace('{tipo_di_file}', fileType.toLowerCase())
-        : linkFormatted
-      const protocol = location.protocol
-      const host = location.hostname
-      const entryPoint =
-        process.env.NODE_ENV === 'production'
-          ? protocol + '//' + host + '/'
-          : 'https://peakfood.condivision.cloud/'
-      return entryPoint + linkFormatted
     },
     capitalize (str) {
       return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ')

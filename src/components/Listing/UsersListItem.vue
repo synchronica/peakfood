@@ -201,28 +201,6 @@ export default {
     copyItem (event, item) {
       this.$emit('copy-item', event, item)
     },
-
-    hrefLink (link, protocolloFile, fileType) {
-      if (!link) {
-        console.log('No link', protocolloFile)
-      }
-
-      let originalLink = link || ''
-      let linkFormatted = originalLink.replace(
-        '{protocollo_file}',
-        protocolloFile
-      )
-      linkFormatted = fileType
-        ? linkFormatted.replace('{tipo_di_file}', fileType.toLowerCase())
-        : linkFormatted
-      const protocol = location.protocol
-      const host = location.hostname
-      const entryPoint =
-        process.env.NODE_ENV === 'production'
-          ? protocol + '//' + host + '/'
-          : 'https://peakfood.condivision.cloud/'
-      return entryPoint + linkFormatted
-    },
     capitalize (str) {
       return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ')
     },

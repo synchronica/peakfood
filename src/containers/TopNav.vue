@@ -5,7 +5,12 @@
         v-if="isMain"
         href="#"
         class="menu-button d-none d-md-block"
-        @click.prevent="changeSideMenuStatus({step :menuClickCount+1,classNames:menuType})"
+        @click.prevent="
+          changeSideMenuStatus({
+            step: menuClickCount + 1,
+            classNames: menuType
+          })
+        "
       >
         <menu-icon />
       </a>
@@ -19,10 +24,20 @@
       </a>
 
       <router-link class="d-none d-xs-block ml-4" tag="a" to="/">
-        <b-img class="d-none d-xs-block" :src="tenantInfo.tenant_logo" height="40px" alt="Responsive image"></b-img>
+        <b-img
+          class="d-none d-xs-block"
+          :src="tenantInfo.tenant_logo"
+          height="40px"
+          alt="Responsive image"
+        ></b-img>
       </router-link>
       <router-link class="ml-4" tag="a" to="/">
-        <b-img class="d-block d-xs-none" :src="tenantInfo.tenant_logo" width="120px" alt="Responsive image"></b-img>
+        <b-img
+          class="d-block d-xs-none"
+          :src="tenantInfo.tenant_logo"
+          width="120px"
+          alt="Responsive image"
+        ></b-img>
       </router-link>
     </div>
 
@@ -33,8 +48,15 @@
             <b-button
               variant="empty"
               class="header-icon btn-sm"
-              @click="toggleFullScreen">
-              <i :class="{'d-inline-block':true,'simple-icon-size-actual':fullScreen,'simple-icon-size-fullscreen':!fullScreen }"/>
+              @click="toggleFullScreen"
+            >
+              <i
+                :class="{
+                  'd-inline-block': true,
+                  'simple-icon-size-actual': fullScreen,
+                  'simple-icon-size-fullscreen': !fullScreen
+                }"
+              />
             </b-button>
           </div>
         </div>
@@ -49,20 +71,19 @@
           no-caret
         >
           <template slot="button-content">
-            <span v-if="isPeak && currentUser.displayName" class="name mr-1">{{ currentUser.displayName }}</span>
-            <span v-else class="name mr-1">{{tenantInfo.tenant_admin_name}}</span>
-            <span v-if="isPeak">
-              <img :alt="currentUser.currentUser" :src="currentUser.photoURL" />
-            </span>
-            <span v-else>
-              <img :alt="tenantInfo.tenant_admin_name" :src="tenantInfo.tenant_icon" />
+            <!-- <span v-if="isPeak && currentUser.displayName" class="name mr-1">{{
+              currentUser.displayName
+            }}</span> -->
+            <span class="name mr-1">{{ tenantInfo.tenant_admin_name }}</span>
+            <span>
+              <img :alt="currentUser.currentUser" src="/assets/img/pino.png" />
             </span>
           </template>
-          <b-dropdown-item>Account</b-dropdown-item>
+          <!-- <b-dropdown-item>Account</b-dropdown-item>
           <b-dropdown-item>Features</b-dropdown-item>
           <b-dropdown-item>History</b-dropdown-item>
           <b-dropdown-item>Support</b-dropdown-item>
-          <b-dropdown-divider />
+          <b-dropdown-divider /> -->
           <b-dropdown-item @click="logout">Sign out</b-dropdown-item>
         </b-dropdown>
       </div>
@@ -70,27 +91,27 @@
   </nav>
 </template>
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { MenuIcon, MobileMenuIcon } from '@/components/Svg'
+import { mapGetters, mapMutations, mapActions } from "vuex";
+import { MenuIcon, MobileMenuIcon } from "@/components/Svg";
 
-import notifications from '@/data/notifications'
+import notifications from "@/data/notifications";
 import {
   searchPath,
   menuHiddenBreakpoint,
   localeOptions,
   buyUrl,
   defaultColor
-} from '@/constants/config'
-import { getDirection, setDirection } from '@/utils'
+} from "@/constants/config";
+import { getDirection, setDirection } from "@/utils";
 export default {
   components: {
     MenuIcon,
     MobileMenuIcon
   },
-  data () {
+  data() {
     return {
-      selectedParentMenu: '',
-      searchKeyword: '',
+      selectedParentMenu: "",
+      searchKeyword: "",
       isMobileSearch: false,
       isSearchOver: false,
       fullScreen: false,
@@ -100,81 +121,81 @@ export default {
       buyUrl,
       notifications,
       isDarkActive: false
-    }
+    };
   },
   methods: {
-    ...mapMutations(['changeSideMenuStatus', 'changeSideMenuForMobile']),
-    ...mapActions(['setLang', 'signOut']),
-    search () {
-      this.$router.push(`${this.searchPath}?search=${this.searchKeyword}`)
-      this.searchKeyword = ''
+    ...mapMutations(["changeSideMenuStatus", "changeSideMenuForMobile"]),
+    ...mapActions(["setLang", "signOut"]),
+    search() {
+      this.$router.push(`${this.searchPath}?search=${this.searchKeyword}`);
+      this.searchKeyword = "";
     },
-    searchClick () {
+    searchClick() {
       if (window.innerWidth < this.menuHiddenBreakpoint) {
         if (!this.isMobileSearch) {
-          this.isMobileSearch = true
+          this.isMobileSearch = true;
         } else {
-          this.search()
-          this.isMobileSearch = false
+          this.search();
+          this.isMobileSearch = false;
         }
       } else {
-        this.search()
+        this.search();
       }
     },
-    handleDocumentforMobileSearch () {
+    handleDocumentforMobileSearch() {
       if (!this.isSearchOver) {
-        this.isMobileSearch = false
-        this.searchKeyword = ''
+        this.isMobileSearch = false;
+        this.searchKeyword = "";
       }
     },
 
-    changeLocale (locale, direction) {
-      const currentDirection = getDirection().direction
+    changeLocale(locale, direction) {
+      const currentDirection = getDirection().direction;
       if (direction !== currentDirection) {
-        setDirection(direction)
+        setDirection(direction);
       }
 
-      this.setLang(locale)
+      this.setLang(locale);
     },
-    logout () {
+    logout() {
       this.signOut().then(() => {
-        this.$router.push('/user/login')
-      })
+        this.$router.push("/user/login");
+      });
     },
 
-    toggleFullScreen () {
-      const isInFullScreen = this.isInFullScreen()
+    toggleFullScreen() {
+      const isInFullScreen = this.isInFullScreen();
 
-      var docElm = document.documentElement
+      var docElm = document.documentElement;
       if (!isInFullScreen) {
         if (docElm.requestFullscreen) {
-          docElm.requestFullscreen()
+          docElm.requestFullscreen();
         } else if (docElm.mozRequestFullScreen) {
-          docElm.mozRequestFullScreen()
+          docElm.mozRequestFullScreen();
         } else if (docElm.webkitRequestFullScreen) {
-          docElm.webkitRequestFullScreen()
+          docElm.webkitRequestFullScreen();
         } else if (docElm.msRequestFullscreen) {
-          docElm.msRequestFullscreen()
+          docElm.msRequestFullscreen();
         }
       } else {
         if (document.exitFullscreen) {
-          document.exitFullscreen()
+          document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen()
+          document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen()
+          document.mozCancelFullScreen();
         } else if (document.msExitFullscreen) {
-          document.msExitFullscreen()
+          document.msExitFullscreen();
         }
       }
-      this.fullScreen = !isInFullScreen
+      this.fullScreen = !isInFullScreen;
     },
-    getThemeColor () {
-      return localStorage.getItem('themeColor')
-        ? localStorage.getItem('themeColor')
-        : defaultColor
+    getThemeColor() {
+      return localStorage.getItem("themeColor")
+        ? localStorage.getItem("themeColor")
+        : defaultColor;
     },
-    isInFullScreen () {
+    isInFullScreen() {
       return (
         (document.fullscreenElement && document.fullscreenElement !== null) ||
         (document.webkitFullscreenElement &&
@@ -182,81 +203,85 @@ export default {
         (document.mozFullScreenElement &&
           document.mozFullScreenElement !== null) ||
         (document.msFullscreenElement && document.msFullscreenElement !== null)
-      )
+      );
     }
   },
   computed: {
-    isMain () {
-      if (this.$route.path === '/terms' || this.$route.path === '/plans' || this.$route.path === '/cart') {
-        return false
+    isMain() {
+      if (
+        this.$route.path === "/terms" ||
+        this.$route.path === "/plans" ||
+        this.$route.path === "/cart"
+      ) {
+        return false;
       } else {
-        return true
+        return true;
       }
     },
-    isPeak () {
-      if (this.$store.getters.getHost === 'peakfood.condivision.cloud') {
-        return true
+    isPeak() {
+      if (this.$store.getters.getHost === "peakfood.condivision.cloud") {
+        return true;
       } else {
-        return false
+        return false;
       }
     },
-    currentUser () {
-      return this.$store.user.currentUser
+    currentUser() {
+      return this.$store.user.currentUser;
     },
     ...mapGetters({
-      currentUser: 'currentUser',
-      menuType: 'getMenuType',
-      menuClickCount: 'getMenuClickCount',
-      tenantInfo: 'getTenantInfo'
+      currentUser: "currentUser",
+      menuType: "getMenuType",
+      menuClickCount: "getMenuClickCount",
+      tenantInfo: "getTenantInfo"
     })
   },
-  beforeDestroy () {
-    document.removeEventListener('click', this.handleDocumentforMobileSearch)
+  beforeDestroy() {
+    document.removeEventListener("click", this.handleDocumentforMobileSearch);
   },
-  created () {
-    const color = this.getThemeColor()
-    this.isDarkActive = color.indexOf('dark') > -1
+  created() {
+    const color = this.getThemeColor();
+    this.isDarkActive = color.indexOf("dark") > -1;
   },
   watch: {
-    '$i18n.locale' (to, from) {
+    "$i18n.locale"(to, from) {
       if (from !== to) {
-        this.$router.go(this.$route.path)
+        this.$router.go(this.$route.path);
       }
     },
-    isDarkActive (val) {
-      let color = this.getThemeColor()
-      let isChange = false
-      if (val && color.indexOf('light') > -1) {
-        isChange = true
-        color = color.replace('light', 'dark')
-      } else if (!val && color.indexOf('dark') > -1) {
-        isChange = true
-        color = color.replace('dark', 'light')
+    isDarkActive(val) {
+      let color = this.getThemeColor();
+      let isChange = false;
+      if (val && color.indexOf("light") > -1) {
+        isChange = true;
+        color = color.replace("light", "dark");
+      } else if (!val && color.indexOf("dark") > -1) {
+        isChange = true;
+        color = color.replace("dark", "light");
       }
       if (isChange) {
-        localStorage.setItem('themeColor', color)
+        localStorage.setItem("themeColor", color);
         setTimeout(() => {
-          window.location.reload()
-        }, 500)
+          window.location.reload();
+        }, 500);
       }
     },
-    isMobileSearch (val) {
+    isMobileSearch(val) {
       if (val) {
-        document.addEventListener('click', this.handleDocumentforMobileSearch)
+        document.addEventListener("click", this.handleDocumentforMobileSearch);
       } else {
         document.removeEventListener(
-          'click',
+          "click",
           this.handleDocumentforMobileSearch
-        )
+        );
       }
     }
   }
-}
+};
 </script>
 
 <style>
-  .navbar .navbar-logo {
-    width: fit-content;
-    height: fit-content;
+.navbar .navbar-logo {
+  width: fit-content;
+  height: fit-content;
 }
 </style>

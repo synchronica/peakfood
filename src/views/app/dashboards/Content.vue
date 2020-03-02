@@ -230,8 +230,6 @@ import cakes from '@/data/cakes'
 import comments from '@/data/comments'
 import { getDirection } from '@/utils'
 import { apiUrl } from '@/constants/config'
-import { instance } from '@/axiosInstance'
-import axios from 'axios'
 
 export default {
   components: {
@@ -321,6 +319,9 @@ export default {
     }, 50)
   },
   computed: {
+    axios () {
+      return this.$store.getters.getAxios
+    },
     host () {
       return this.$store.getters.getHost
     },
@@ -351,7 +352,7 @@ export default {
       console.log(this.quickPost)
     },
     async getCounters () {
-      const response = await instance.post('/api/GetCounters')
+      const response = await this.axios.post('/api/GetCounters')
       console.log('counters', response)
       const data = await response.data.data
       this.counters = data
@@ -393,42 +394,42 @@ export default {
       }
       formData.set('id', 0)
       console.log('Object Sent: ', object)
-      axios
-        .post(
-          this.apiBase + '?update=5&token=1' + (copy ? '&copy' : ''),
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-        )
-        .then(response => {
-          const status = response.data.status
-          const data = response.data.data
-          console.log('Ajax Response: ', response)
-          if (status) {
-            // const recordId = data.recordId
-            const type = 'success filled'
-            const title = 'Successo'
-            const message = 'Nuovo Intervento aggiunto'
-            this.$notify(type, title, message, { duration: 3000, permanent: false })
-          } else {
-            const type = 'error filled'
-            const title = 'C\'è stato un problema'
-            const message = data.data.message
-            this.$notify(type, title, message, { duration: 3000, permanent: false })
-          }
-        })
-        .catch(error => {
-          console.error(error)
-        })
+      // axios
+      //   .post(
+      //     this.apiBase + '?update=5&token=1' + (copy ? '&copy' : ''),
+      //     formData,
+      //     {
+      //       headers: {
+      //         'Content-Type': 'multipart/form-data'
+      //       }
+      //     }
+      //   )
+      //   .then(response => {
+      //     const status = response.data.status
+      //     const data = response.data.data
+      //     console.log('Ajax Response: ', response)
+      //     if (status) {
+      //       // const recordId = data.recordId
+      //       const type = 'success filled'
+      //       const title = 'Successo'
+      //       const message = 'Nuovo Intervento aggiunto'
+      //       this.$notify(type, title, message, { duration: 3000, permanent: false })
+      //     } else {
+      //       const type = 'error filled'
+      //       const title = 'C\'è stato un problema'
+      //       const message = data.data.message
+      //       this.$notify(type, title, message, { duration: 3000, permanent: false })
+      //     }
+      //   })
+      //   .catch(error => {
+      //     console.error(error)
+      //   })
     },
     capitalize (str) {
       return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ')
     },
     async getTableContent () {
-      const response = await instance.post('/api/WDataReport')
+      const response = await this.axios.post('/api/WDataReport')
       console.log('WDataReport', response)
       const data = await response.data.data
       let fields = []

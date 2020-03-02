@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en-US">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no"    />
-    <link rel="stylesheet" href="<%= BASE_URL %>assets/fonts/simple-line-icons/css/simple-line-icons.css">
-    <link rel="stylesheet" href="<%= BASE_URL %>assets/fonts/iconsmind-s/css/iconsminds.css">
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no"
+    />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <link
+      rel="stylesheet"
+      href="<%= BASE_URL %>assets/fonts/simple-line-icons/css/simple-line-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="<%= BASE_URL %>assets/fonts/iconsmind-s/css/iconsminds.css"
+    />
+  </head>
 
-<body class="rtl">
+  <body class="rtl">
     <noscript>
-        You need to enable JavaScript to run this app.
+      You need to enable JavaScript to run this app.
     </noscript>
-    <div id="app">
-    </div>
+    <div id="app"></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -23,5 +32,5 @@
       To begin the development, run `npm run dev` or `yarn dev`.
       To create a production bundle, use `npm run prod` or `yarn prod`.
     -->
-</body>
+  </body>
 </html>

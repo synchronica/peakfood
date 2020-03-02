@@ -1,48 +1,101 @@
 <template>
-  <b-modal id="distintabasemodal" ref="distintabasemodal" size="lg" body-class="new-modal">
+  <b-modal
+    id="distintabasemodal"
+    ref="distintabasemodal"
+    size="lg"
+    body-class="new-modal"
+  >
     <template slot="modal-title">
       <b-container>
         <b-row>
           <h1 style="padding-bottom: 0px; margin-bottom: 0px; width: 100%;">
+            {{ title }}
+          </h1>
+          <b-row class="w-100 mt-2">
+            <b-col lg="6">
+              <h5 style="padding-bottom: 0px; margin-bottom: 0px; width: 100%;">
+                Distinta Base per...
+                <b-form-input
+                  id="portions"
+                  class="w-20 d-inline mr-2 ml-2"
+                  size="sm"
+                  :formatter="toDot"
+                  @change="handleFieldChange"
+                  v-model="dibaItem.quantita_prodotta"
+                />porzioni
+              </h5>
+            </b-col>
+            <b-col lg="6">
+              <h5>
+                Tempo di preparazione
+                <b-form-input
+                  class="w-20 d-inline mr-2 ml-2"
+                  size="sm"
+                  :formatter="toDot"
+                  @change="handleFieldChange"
+                  v-model="dibaItem.tempo_di_preparazione"
+                />min
+              </h5>
+            </b-col>
+          </b-row>
+          <!-- <h5 style="padding-bottom: 0px; margin-bottom: 0px; width: 100%;">
             Distinta Base per n.
             <b-form-input
               id="portions"
+              class="mr-2"
               size="sm"
               :formatter="toDot"
               @change="handleFieldChange"
               v-model="dibaItem.quantita_prodotta"
             />porzioni
-          </h1>
+          </h5>
+          <h5>
+            <b-input-group prepend="Tempo di preparazione" append="min">
+              <b-form-input
+                :formatter="toDot"
+                @change="handleFieldChange"
+                v-model="dibaItem.tempo_di_preparazione"
+              ></b-form-input>
+            </b-input-group>
+          </h5>-->
         </b-row>
       </b-container>
     </template>
     <b-form @submit.prevent="addIngredient">
       <b-card class="ma-0 px-4 py-4 search-header-border" no-body>
         <b-row>
-          <b-col md="6">
-            <label class="search-label" for>
-              <b-link
-                v-if="createIngredient"
-                class="new-item-link"
-                @click="createIngredient=false"
-              >Crea Nuovo</b-link>
-              <b-link v-else class="new-item-link" @click="createIngredient=true">Cerca</b-link>
-            </label>
-
+          <b-col md="5">
+            <b-button
+              size="xs"
+              :variant="searchIngredientToggle"
+              @click="createIngredient = false"
+              >Cerca</b-button
+            >
+            <b-button
+              size="xs"
+              :variant="createIngredientToggle"
+              @click="createIngredient = true"
+              >Crea Nuovo</b-button
+            >
             <v-select
-              v-if="createIngredient"
+              v-if="createIngredient === false"
+              class="mt-1"
               label="title"
               @search="onSearch"
               :options="optionsFetched"
               v-model="search"
+              placeholder="Seleziona un ingrediente"
             >
               <template slot="no-options">
                 <div v-html="searchMessage" />
               </template>
             </v-select>
-            <b-input v-else v-model="newIngredient.name" />
+            <b-input v-else class="mt-1" v-model="newIngredient.title" />
+            <small v-if="ingredientInvalid" style="color: red"
+              >Ingrediente richiesto</small
+            >
           </b-col>
-          <b-col md="2">
+          <b-col md="3">
             <label for>UM</label>
             <v-select
               :options="measureUnits"
@@ -62,7 +115,9 @@
         </b-row>
         <b-row class="mt-4">
           <b-col class="justify-self-end">
-            <b-button block type="submit" variant="outline-primary">Aggiungi</b-button>
+            <b-button block type="submit" variant="outline-primary"
+              >Aggiungi</b-button
+            >
             <!-- <b-button v-else @click="addIngredient(true)" variant="primary">Crea Ingrediente</b-button> -->
           </b-col>
         </b-row>
@@ -89,7 +144,11 @@
               </div>
             </template>
             <template v-slot:cell(actions)="data">
-              <b-button variant="empty" class="px-0 py-0" @click="removeIngredient(data.item.id)">
+              <b-button
+                variant="empty"
+                class="px-0 py-0"
+                @click="removeIngredient(data.item.id)"
+              >
                 <i class="simple-icon-trash" />
               </b-button>
             </template>
@@ -100,15 +159,15 @@
     <template slot="modal-footer">
       <b-container>
         <b-row class="d-flex flex-grow-1">
-          <b-col lg="4">
-            <b-input-group prepend="Tempo di preparazione">
+          <!-- <b-col lg="5">
+            <b-input-group prepend="Tempo di preparazione" append="min">
               <b-form-input
                 :formatter="toDot"
                 @change="handleFieldChange"
                 v-model="dibaItem.tempo_di_preparazione"
               ></b-form-input>
             </b-input-group>
-          </b-col>
+          </b-col>-->
           <b-col class="pr-0 align-self-end">
             <p class="total-cost text-right mb-0">
               <strong>Food Cost {{ dibaItem.food_cost }} €</strong>
@@ -123,10 +182,9 @@
 <script>
 import vSelect from "vue-select";
 import axios from "axios";
-import { instance } from "@/axiosInstance";
 
 export default {
-  props: ["id", "item"],
+  props: ["id", "item", "isSoftDelete"],
   components: {
     vSelect
   },
@@ -134,7 +192,7 @@ export default {
     searchOptions: [],
     dibaItem: {},
     newIngredient: {
-      name: null,
+      title: null,
       measureUnit: null,
       netto: null,
       quantity: 1
@@ -146,10 +204,10 @@ export default {
       quantity: null
     },
     deleteLink: "",
-    createIngredient: true,
+    createIngredient: false,
     isBusy: false,
     search: null,
-    searchMessage: "Cerca ingrediente",
+    searchMessage: "Inserisci almeno tre lettere",
     optionsFetched: [],
     tableData: [],
     measureUnits: [],
@@ -166,10 +224,6 @@ export default {
         key: "quantity",
         label: "Quantita"
       },
-      // {
-      //   key: 'scarto',
-      //   label: 'Scarto'
-      // },
       {
         key: "netto",
         label: "Netto"
@@ -187,24 +241,29 @@ export default {
         label: ""
       }
     ],
-    options: []
+    options: [],
+    ingredientInvalid: false
   }),
   created() {
     this.getUM();
   },
   methods: {
     async getUM() {
-      const formData = new FormData();
-      formData.set("list_values", "unita_di_misura");
-      // formData.set('listalues', element)
+      try {
+        const formData = new FormData();
+        formData.set("list_values", "unita_di_misura");
+        // formData.set('listalues', element)
 
-      const res = await instance.post("/api/ListValues", formData);
-      // const apiBase = "https://" + this.$store.getters.getHost + "/v3.0/";
-      // const filterSelectOptionsEndpoint = `${apiBase}?list_values=unita_di_misura&token=1`;
+        const res = await this.axios.post("/api/ListValues", formData);
+        // const apiBase = "https://" + this.$store.getters.getHost + "/v3.0/";
+        // const filterSelectOptionsEndpoint = `${apiBase}?list_values=unita_di_misura&token=1`;
 
-      // const response = await axios.get(filterSelectOptionsEndpoint);
-      console.log("UM", res);
-      this.measureUnits = res.data.data;
+        // const response = await axios.get(filterSelectOptionsEndpoint);
+        console.log("UM", res);
+        this.measureUnits = res.data.data;
+      } catch (error) {
+        console.log(error);
+      }
     },
     toUpper(value, event) {
       return value.toUpperCase();
@@ -253,19 +312,27 @@ export default {
           loading(false);
         }
       } else {
-        this.searchMessage = "Cerca ingrediente";
+        this.searchMessage = "Inserisci almeno tre lettere";
         loading(false);
       }
     },
     async getTableIngredients(id) {
       this.isBusy = true;
       this.tableData = [];
+      let formData = new FormData();
+      formData.set("data_provider", "6");
+      formData.set("ricetta_id", id);
       try {
-        const response = await axios.get(
-          `https://${this.host}/v3.0/?data_provider=6&token=1${this.query}&ricetta_id=${id}`
-        );
-        const responseIngredients = await axios.get(
-          `https://${this.host}/v3.0/?data_provider=4&token=1&sort=ingrediente&per_page=50`
+        const response = await this.axios.post("/api/DataProvider", formData);
+
+        formData = new FormData();
+        formData.set("data_provider", "4");
+        formData.set("sort", "ingrediente");
+        formData.set("per_page", "50");
+
+        const responseIngredients = await this.axios.post(
+          "/api/DataProvider",
+          formData
         );
         console.log("ingredients", response);
         this.deleteLink = await response.data.delete;
@@ -311,10 +378,14 @@ export default {
     },
     async getOptionIngredients(id) {
       this.options = [];
+      let formData = new FormData();
+      formData.set("data_provider", id);
+      formData.set("sort", "ingrediente");
+      formData.set("per_page", "50");
+
       try {
-        const response = await axios.get(
-          `https://${this.host}/v3.0/?data_provider=${id}&token=1&sort=ingrediente&per_page=50`
-        );
+        const response = await this.axios.post("/api/DataProvider", formData);
+
         console.log("options", response);
         const data = await response.data.data;
 
@@ -339,6 +410,11 @@ export default {
       }
     },
     async addIngredient(addToDiBa = false) {
+      this.ingredientInvalid = false;
+      if (!this.newIngredient.title) {
+        this.ingredientInvalid = true;
+        return;
+      }
       const moduleId = addToDiBa ? 6 : 4;
       const formData = new FormData();
       let {
@@ -355,14 +431,12 @@ export default {
       formData.set("unita_di_misura", measureUnit);
       formData.set("netto", netto);
       formData.set("quantita", quantity);
+      formData.set("update", moduleId);
 
       try {
         this.isBusy = true;
-        const response = await axios.post(
-          `https://${this.host}/v3.0/?update=${moduleId}&token=1`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
+        const response = await this.axios.post("/api/InsertUpdate", formData);
+
         const cost = (Number(quantity) * Number(netto)).toFixed(2);
         const ingredient = {
           title: name || title,
@@ -396,17 +470,44 @@ export default {
         .then(async value => {
           if (value) {
             this.isBusy = true;
+            console.log("worked");
+
+            // if (id) {
+            //   ids.push(id)
+            // }
+            // const formData = new FormData()
+            // formData.set('delete', this.moduleId)
+            // ids.forEach((val, index) => {
+            //   formData.set(`ids[${index}]`, val)
+            // })
+            // if (ids.length > 0) {
+            //   try {
+            //     const response = await this.axios.post(
+            //       '/api/DeleteItem',
+            //       formData
+            //     )
+            //     console.log('deleteResponse', response)
+            //     this.items = this.items.filter(item => {
+            //       return ids.indexOf(item.id) === -1
+            //     })
+            //     this.selectedItems = []
+            //   } catch (error) {
+            //     console.log(error)
+            //   }
+            // }
             const formData = new FormData();
+            formData.set(
+              "delete",
+              this.$store.state.modulesManager.module_tab_id
+            );
 
             formData.set("ids[0]", id);
 
             try {
-              const response = await axios.post(
-                `https://${this.host}/v3.0/${this.deleteLink}`,
-                formData,
-                { headers: { "Content-Type": "multipart/form-data" } }
+              const response = await this.$store.state.axios.post(
+                "/api/DeleteItem",
+                formData
               );
-
               console.log("remove", response);
               this.tableData = this.tableData.filter(data => data.id !== id);
               this.handleFoodCost();
@@ -416,6 +517,23 @@ export default {
             } catch (error) {
               console.log(error);
             }
+
+            // try {
+            //   const response = await axios.post(
+            //     `https://${this.host}/v3.0/${this.deleteLink}&token=1`,
+            //     formData,
+            //     { headers: { 'Content-Type': 'multipart/form-data' } }
+            //   )
+
+            //   console.log('remove', response)
+            //   this.tableData = this.tableData.filter(data => data.id !== id)
+            //   this.handleFoodCost()
+            //   this.handleFieldChange()
+
+            //   this.isBusy = false
+            // } catch (error) {
+            //   console.log(error)
+            // }
           }
         })
         .catch(err => {
@@ -478,6 +596,29 @@ export default {
     }
   },
   computed: {
+    axios() {
+      return this.$store.getters.getAxios;
+    },
+    title() {
+      if (this.item) {
+        return this.item.nome;
+      }
+      return "";
+    },
+    createIngredientToggle() {
+      if (this.createIngredient) {
+        return "primary";
+      } else {
+        return "light";
+      }
+    },
+    searchIngredientToggle() {
+      if (this.createIngredient) {
+        return "light";
+      } else {
+        return "primary";
+      }
+    },
     hasQuantitaProdotta() {
       if (this.dibaItem.quantita_prodotta) {
         return true;
@@ -546,5 +687,9 @@ export default {
 
 .modal-title {
   width: 100%;
+}
+
+.small-input {
+  width: 50px;
 }
 </style>

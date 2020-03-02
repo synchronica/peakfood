@@ -1,13 +1,15 @@
-import userStore from '@/store/modules/user'
+import userStore from "@/store/modules/user";
 
 export default (to, from, next) => {
-  const currentUser = userStore.state.currentUser ? userStore.state.currentUser : localStorage.getItem('user')
+  const currentUser = userStore.state.currentUser
+    ? userStore.state.currentUser
+    : localStorage.getItem("user");
 
   if (currentUser) {
-    next()
+    next();
   } else {
-    localStorage.removeItem('user')
-    next('/user/login')
+    localStorage.removeItem("user");
+    next("/user/login");
   }
   // firebase.auth().onAuthStateChanged(userData => {
   //   if (userData) {
@@ -36,4 +38,4 @@ export default (to, from, next) => {
   //     next('/user/login')
   //   }
   // })
-}
+};

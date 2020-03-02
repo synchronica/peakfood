@@ -9,7 +9,7 @@ const routes = [
     path: '/',
     component: () => import(/* webpackChunkName: "app" */ '@/views/app'),
     redirect: '/app/dashboards',
-    // beforeEnter: AuthRequired,
+    beforeEnter: AuthRequired,
     children: [
       {
         path: '/app/dashboards',

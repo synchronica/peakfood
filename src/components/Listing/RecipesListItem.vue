@@ -34,18 +34,6 @@
               <i style="font-size: 24px; cursor: pointer; color:red;" class="glyph-icon" :class="{'icon-heart': data.favorite == 0, 'icon-heart1': data.favorite == 1}"/>
             </div>
 
-            <!-- BADGE WITH ICON AND LINK -->
-            <div v-if="field.background && field.action === 'fileOpen' && field.link !== '{link}'" class="w-sm-100">
-              <a
-                target="_blank"
-                :href="hrefLink(field.link, data.protocollo_file, data.tipo_di_file)"
-                class="badge badge-pill"
-                :style="{ background: field.background, color: (field.color ? field.color : 'white') }"
-              >
-                <i :class="`mr-1 glyph-icon ${field.icon ? field.icon : 'simple-icon-cloud-download'}`"/> <span v-html="decodeHTML(data[field.field])" />
-              </a>
-            </div>
-
             <!-- BADGE WITH ICON AND EXTERNAL LINK -->
             <div v-else-if="field.background && field.link === '{link}'" class="w-sm-100">
               <a

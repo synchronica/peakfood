@@ -1,14 +1,51 @@
 <template>
   <b-card
-    :img-src="data.img_ricetta"
+    :img-src="recipeImage"
     img-alt="Image"
     img-top
-    class="rounded h-100" :class="{'active' : selectedItems.includes(data.id)}" no-body>
+    class="rounded h-100 recipe"
+    :class="{'active' : selectedItems.includes(data.id)}"
+    no-body
+  >
     <div class="position-relative">
-      <b-badge pill variant="primary" class="position-absolute badge-top-left justify-self-start">{{ data.categoria_ricetta.toUpperCase() }}</b-badge>
+      <b-badge
+        pill
+        variant="primary"
+        class="position-absolute badge-top-left justify-self-start"
+      >{{ data.categoria_ricetta.toUpperCase() }}</b-badge>
     </div>
     <div style="height: 40px;" class="d-flex w-100 justify-content-end pt-2 pr-2">
-      <i v-if="data.acquisita === '1'"  style="font-size:20px; color: green;" class="simple-icon-check"/>
+      <b-tooltip target="active" title="Online!"></b-tooltip>
+      <a
+        id="active"
+        @click="toggleAttivo"
+        style="cursor: pointer"
+        class="mr-2"
+        v-b-tooltip.hover
+        title="Attivo"
+      >
+        <i
+          style="font-size:20px;"
+          :style="{color: data.attivo === '1' ? 'green' : 'red'}"
+          class="simple-icon-bulb"
+        />
+      </a>
+      <a
+        v-if="data.acquisita === '0'"
+        @click="handleSetRecipe"
+        style="cursor: pointer"
+        v-b-tooltip.hover
+        title="Acquisisci Ricetta"
+      >
+        <i style="font-size:20px; color: red;" class="simple-icon-plus" />
+      </a>
+      <i
+        v-else
+        style="font-size:20px; color: green;"
+        class="simple-icon-check"
+        v-b-tooltip.hover
+        title="Questa Ricetta è presente nel tuo Food Cost"
+      />
     </div>
     <b-card-body>
       <b-row>
@@ -16,36 +53,28 @@
           <!-- CARD ITEMS -->
           <b-row :key="'r-'+index">
             <b-container>
-              <a style="cursor: pointer;" @click="getIngredients(data.id)">
-                <h3 class="mb-1 w-sm-100" v-html="decodeHTML(data.nome)"/>
+              <a style="cursor: pointer;" @click="getIngredients(data)">
+                <h3 style="display: inline" class="mb-1 w-sm-100" v-html="decodeHTML(data.nome)" />
               </a>
 
-              <p class="mb-1 text-muted text-small w-sm-100" v-html="decodeHTML(data.note)"/>
+              <p class="mb-1 text-muted text-small w-sm-100" v-html="decodeHTML(data.note)" />
             </b-container>
           </b-row>
         </b-colxx>
       </b-row>
     </b-card-body>
-    <template v-slot:footer>
-      <b-row>
-        <b-container class="d-flex justify-content-center text-center">
-          <a @click="handleSetRecipe" style="color: #f18024; cursor: pointer;">{{ data.acquisita === '1' ? 'Questa Ricetta è presente nel tuo Food Cost' : 'Acquisisci Ricetta' }}</a>
-        </b-container>
-      </b-row>
-    </template>
-
   </b-card>
 </template>
 <script>
 import { listItemMixin } from '@/mixins/listItemMixin'
-import IngredientsModal from '@/components/Modals/IngredientsModal'
+// import IngredientsModal from '@/components/Modals/IngredientsModal'
 import axios from 'axios'
 
 export default {
   props: ['data', 'selectedItems', 'fields', 'actions', 'options', 'index'],
-  components: {
-    IngredientsModal
-  },
+  // components: {
+  //   IngredientsModal
+  // },
   mixins: [listItemMixin],
   data () {
     return {
@@ -53,39 +82,64 @@ export default {
     }
   },
   methods: {
+    toggleAttivo () {
+      let attivo = null
+      if (this.data.attivo === '1') {
+        attivo = '0'
+      } else {
+        attivo = '1'
+      }
+      const payload = { id: this.data.id, attivo }
+      this.$emit('toggle-attivo', payload)
+    },
     openModal (id) {
       console.log('id', id)
       this.$bvModal.show(id)
     },
-    async getIngredients (id) {
+    async getIngredients (data) {
       try {
-        let ingredients = []
-        this.$emit('ingredients-loading')
+        const { id, nome } = data
+        // let ingredients = []
+        this.$emit('ingredients-loading', data)
         this.openModal('modal-1')
         const response = await axios.get(
-          `https://${this.host}/v3.0/?data_provider=6&token=1&filters&ricetta_id=${id}`
+          `https://${this.host}/v3.0/?diba_market&token=1&ricetta_id=${id}`
         )
         console.log('recipe', response)
 
-        let ingredientsResponse = await response.data.data
-        console.log('ingredientsResponse', ingredientsResponse)
-        for (let index = 0; index < ingredientsResponse.length; index++) {
-          console.log('index', ingredientsResponse[index])
-          const materiaId = ingredientsResponse[index].materia_id
-          // console.log('materiaId', materiaId)
+        let ingredients = response.data.data
 
-          const responseIngredients = await axios.get(
-            `https://${this.host}/v3.0/?data_provider=4&token=1&filters&id=${materiaId}`
-          )
-          console.log('responseIngredients', responseIngredients)
-          ingredients.push(responseIngredients.data.data[0].ingrediente)
+        ingredients.forEach((ingredient, index) => {
+          const costo = (
+            Number(ingredient.quantita) * Number(ingredient.netto)
+          ).toFixed(2)
+          ingredients[index].costo = costo
+        })
+        // const recipeId = response.data.id
+        const { descrizione } = response.data
+        const footer = {
+          text: response.data.price_info,
+          color: response.data.color
         }
 
-        console.log('ingredients', ingredients)
+        if (ingredients.length < 1) {
+          this.$emit('ingredients-loading', false)
+          const payload = {
+            message: 'Nessun ingrediente trovato'
+          }
+          throw payload
+        }
 
-        // if (ingredientsResponse.length !== 0) {
-        this.$emit('ingredients-fetch', ingredients)
-        // }
+        if (ingredients.length !== 0) {
+          this.$emit(
+            'ingredients-fetch',
+            nome,
+            ingredients,
+            descrizione,
+            footer,
+            id
+          )
+        }
       } catch (error) {
         const type = 'error filled'
         const title = "C'è stato un problema"
@@ -137,6 +191,34 @@ export default {
     }
   },
   computed: {
+    axios () {
+      return this.$store.getters.getAxios
+    },
+    recipeImage () {
+      const category = this.data.categoria_ricetta
+      if (category === 'Secondi') {
+        return '/assets/img/secondi.jpg'
+      }
+      if (category === 'Primi') {
+        return '/assets/img/primi.jpg'
+      }
+      if (category === 'Dessert') {
+        return '/assets/img/dessert.jpg'
+      }
+      if (category === 'Antipasti') {
+        return '/assets/img/antipasti.jpg'
+      }
+      if (category === 'Contorni') {
+        return '/assets/img/contorni.jpg'
+      }
+      if (category === 'Glutine') {
+        return '/assets/img/glutine.jpg'
+      }
+      if (category === 'Crostacei') {
+        return '/assets/img/crostacei.jpg'
+      }
+      return this.data.img_ricetta
+    },
     host () {
       return this.$store.state.host
     },
@@ -156,9 +238,13 @@ export default {
           return field
         }
       })
-      fieldsSorted = fieldsSorted.sort((a, b) => (a.in_list > b.in_list) ? 1 : ((b.in_list > a.in_list) ? -1 : 0))
+      fieldsSorted = fieldsSorted.sort((a, b) =>
+        a.in_list > b.in_list ? 1 : b.in_list > a.in_list ? -1 : 0
+      )
 
-      let calc = (Number(this.data.food_sell_actual) - Number(this.data.food_cost)).toFixed(2)
+      let calc = (
+        Number(this.data.food_sell_actual) - Number(this.data.food_cost)
+      ).toFixed(2)
 
       fieldsSorted.push({ field: 'margine', value: String(calc) })
       fieldsSorted.push({ field: 'actions' })
@@ -168,8 +254,8 @@ export default {
 }
 </script>
 
-<style>
-.modal-backdrop {
-  opacity: 0.5;
+<style scoped>
+.card-img-top {
+  min-height: 178px;
 }
 </style>
