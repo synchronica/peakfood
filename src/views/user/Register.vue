@@ -39,7 +39,7 @@
                 <span>{{ $t("user.email") }}</span>
               </label>
 
-              <label class="form-group has-float-label mb-4">
+              <!-- <label class="form-group has-float-label mb-4">
                 <b-form-input
                   type="phone"
                   trim
@@ -48,7 +48,7 @@
                   required
                 />
                 <span>Telefono</span>
-              </label>
+              </label> -->
 
               <label class="form-group has-float-label mb-4">
                 <b-form-input

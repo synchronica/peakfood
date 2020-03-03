@@ -409,11 +409,15 @@ export default {
       const formData = new FormData();
       ids.forEach((val, index) => {
         formData.set(`ids[${index}]`, val);
+        formData.set(
+          "removeFavorite",
+          this.$store.state.modulesManager.module_tab_id
+        );
       });
       console.log("idToDelete", ids);
       if (ids.length > 0) {
         try {
-          const response = await this.axios.put(
+          const response = await this.axios.post(
             "/api/RemoveFavorite",
             formData
           );

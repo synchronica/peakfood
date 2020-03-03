@@ -641,7 +641,7 @@ export const listMixin = {
     },
     linkGen(pageNum) {
       // this.loadItems(this.$route.params);
-      return pageNum === 1 ? "?" : `?page=${pageNum}`;
+      return pageNum === 1 ? "?" : `?current_page=${pageNum}`;
     },
     changeAsc(asc) {
       if (this.isLoad) {

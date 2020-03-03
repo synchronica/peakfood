@@ -10,7 +10,7 @@
             <template v-for="(field, lIndex) in localFields">
               <div
                 class="d-none d-lg-block d-xl-block text-truncate"
-                :class="getHeaderWidth(lIndex)"
+                :class="getHeaderWidth(lIndex, field)"
                 :key="field.field"
               >
                 <span v-if="field.field === 'categoria_ricetta'"
@@ -346,10 +346,25 @@ export default {
     capitalize(str) {
       return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, " ");
     },
-    getHeaderWidth(index) {
+    getHeaderWidth(index, field) {
+      if (field.field === "ingrediente") {
+        return { "w-25": true };
+      }
+
+      if (field.field === "unita_di_misura") {
+        return { "w-25": true };
+      }
       return { "w-10": true };
     },
     getWidth(index, field) {
+      if (field.field === "ingrediente") {
+        return { "w-25": true };
+      }
+
+      if (field.field === "unita_di_misura") {
+        return { "w-25": true };
+      }
+      return { "w-10": true };
       if (this.isPeak) {
         return { "w-10": true };
       }
@@ -387,7 +402,9 @@ export default {
     },
     localFields() {
       let fields = [...this.fields];
-      fields = fields.filter(field => Number(field.in_list) > 0);
+      fields = fields.filter(
+        field => Number(field.in_list) > 0 && field.field != "favorite"
+      );
       let fieldsSorted = fields.sort((a, b) =>
         a.in_list > b.in_list ? 1 : b.in_list > a.in_list ? -1 : 0
       );
