@@ -266,7 +266,7 @@ export const listMixin = {
 
         delete dataProvider.created_at;
         delete dataProvider.updated_at;
-
+        this.page = data.current_page;
         this.deleteLink = data.delete;
         this.total = data.total;
         this.from = data.from;

@@ -184,7 +184,7 @@
           </template>
         </b-row>
 
-        <b-row v-if="lastPage > 1">
+        <b-row>
           <b-colxx xxs="12">
             <b-pagination-nav
               :number-of-pages="lastPage"
