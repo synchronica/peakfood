@@ -2,7 +2,7 @@
   <b-row class="h-100">
     <b-colxx xxs="12" md="10" class="mx-auto my-auto">
       <b-card class="auth-card" no-body>
-        <div class="position-relative image-side ">
+        <div class="position-relative image-side cook">
           <p class=" text-white h2">
             {{ $t("dashboards.magic-is-in-the-details") }}
           </p>
@@ -110,7 +110,7 @@
           </div>
           <div class="text-center" v-else>
             <h3 class="mb-4">{{ $t("user.register-success-title") }}</h3>
-            <h6 class="mb-4">{{ $t("user.register-success") }}</h6>
+            <!-- <h6 class="mb-4">{{ $t("user.register-success") }}</h6> -->
             <b-btn
               variant="primary"
               to="/user/login"
@@ -237,3 +237,12 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.cook {
+  width: 40%;
+  background: url(/assets/img/cuocover.jpg) no-repeat top;
+  background-size: cover;
+  padding: 80px 40px;
+}
+</style>
