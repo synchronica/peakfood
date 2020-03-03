@@ -350,9 +350,11 @@ export default {
   },
   methods: {
     handleFilter(route) {
+      console.log("route", route);
       let query = route.slice(route.indexOf("?") + 1).split("=");
       query = {
-        categoria_ricetta: query[1]
+        categoria_ricetta: query[1],
+        filters: 1
       };
 
       if (query.categoria_ricetta === "Tutti") {
@@ -369,12 +371,13 @@ export default {
       console.log("clicked");
     },
     handleFavorite(item) {
-      console.log("item", item);
-      if (item.favorite === "0") {
-        item.favorite = "1";
+      let itemClone = Object.assign({}, item);
+      if (item.favorite == 0) {
+        item.favorite = 1;
       } else {
-        item.favorite = "0";
+        item.favorite = 0;
       }
+      console.log("itemClone", item);
       this.modifiedItem = item;
       this.updateItem(this.modifiedItem);
     },

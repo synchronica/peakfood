@@ -49,7 +49,9 @@
         >
           <template v-for="(field, index) in localFields">
             <div
-              v-if="data[field.field] && field.field !== 'sales_class'"
+              v-if="
+                data[field.field] !== undefined && field.field !== 'sales_class'
+              "
               class="w-sm-100"
               :class="getWidth(index)"
               :key="field.field + field.id"
@@ -71,8 +73,8 @@
                   style="font-size: 24px; cursor: pointer; color:red;"
                   class="glyph-icon"
                   :class="{
-                    'icon-heart': data.favorite == 0,
-                    'icon-heart1': data.favorite == 1
+                    'icon-heart': data.favorite === 0,
+                    'icon-heart1': data.favorite === 1
                   }"
                 />
               </div>

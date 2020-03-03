@@ -585,19 +585,22 @@ export default {
         console.log(error);
       }
 
-      formData = new FormData();
-      formData.set("data_provider", this.module.id);
-      formData.set("filters", 1);
-      formData.set("favorite", "1");
+      let params = { data_provider: this.module.id, filters: 1, favorite: 1 };
+
+      if (paramQuery) {
+        params = Object.assign(params, paramQuery);
+      }
+
+      console.log("params", params);
 
       try {
-        const dataProviderResponse = await this.axios.post(
-          "/api/DataProvider",
-          formData
-        );
+        const dataProviderResponse = await this.axios.get("/api/DataProvider", {
+          params
+        });
         console.log("dataProviderResponse", dataProviderResponse);
         const dataProvider = dataProviderResponse.data.data;
         const { data } = dataProviderResponse;
+        console.log("data", data);
 
         if (!dataProvider) {
           const error = {
@@ -618,7 +621,10 @@ export default {
             }
           }
         }
-        this.quiverCode = data.quiverCode;
+
+        delete dataProvider.created_at;
+        delete dataProvider.updated_at;
+
         this.deleteLink = data.delete;
         this.total = data.total;
         this.from = data.from;
@@ -633,76 +639,6 @@ export default {
         this.isLoad = true;
         console.log(error);
       }
-      // const fieldsManagerEndpoint = `${this.apiUrl}&fields_manager=${this.module.id}&token=1`
-      // const dataProviderEndpoint = `${this.apiUrl}&data_provider=${this.module.id}&token=1${this.filterQuery ? '&filters' + this.filterQuery : ''}`
-
-      // axios.all([
-      //   axios.get(fieldsManagerEndpoint),
-      //   axios.get(dataProviderEndpoint)
-      // ])
-      //   .then(responseArr => {
-      //     this.fieldsManager = []
-      //     this.fieldsManager = responseArr[0].data.data
-      //     console.log('fieldsManagerResponse', responseArr[0])
-      //     let newItem = {}
-      //     let filterForm = {}
-      //     this.fieldsManager.forEach(field => {
-      //       if (field.type === 'date') {
-      //         newItem[field.field] = new Date()
-      //       } else if (field.type === 'tags') {
-      //         newItem[field.field] = []
-      //       } else {
-      //         newItem[field.field] = ''
-      //       }
-
-      //       if (field.type === 'tags' || field.type === 'select' || field.type === 'selectText' || field.type === 'hiddenSelect') {
-      //         this.getSelectOptions(field.field, field.type)
-      //       }
-
-      //       if (Number(field.in_filter) > 0) {
-      //         filterForm[field.field] = ''
-      //       }
-      //     })
-      //     this.newItem = newItem
-      //     this.filterForm = filterForm
-      //     return responseArr[1]
-      //   })
-      //   .then(async response => {
-      //     let data = response.data
-      //     const dataProvider = data.data
-      //     console.log('dataProviderResponse', response)
-
-      //     for (let index = 0; index < dataProvider.length; index++) {
-      //       const item = dataProvider[index]
-      //       if (item.allergeni) {
-      //         if (item.allergeni === '') {
-      //           data.data[index].allergeni = await []
-      //         } else {
-      //           data.data[index].allergeni = await item.allergeni.replace(/[{}]+/g, '').split(',')
-      //         }
-      //       }
-      //     }
-      //     return data
-      //   })
-      //   .then(data => {
-      //     this.quiverCode = data.quiverCode
-      //     this.deleteLink = data.delete
-      //     this.total = data.total
-      //     this.from = data.from
-      //     this.to = data.to
-      //     this.items = data.data
-      //     this.perPage = data.per_page
-      //     this.selectedItems = []
-      //     this.lastPage = data.last_page
-      //     return true
-      //   })
-      //   .then(() => {
-      //     this.hideModal('filtermodal')
-      //     this.isLoad = true
-      //   })
-      //   .catch(error => {
-      //     console.log(error)
-      //   })
     }
   }
 };

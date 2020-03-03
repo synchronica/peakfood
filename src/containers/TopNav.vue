@@ -74,7 +74,9 @@
             <!-- <span v-if="isPeak && currentUser.displayName" class="name mr-1">{{
               currentUser.displayName
             }}</span> -->
-            <span class="name mr-1">{{ tenantInfo.tenant_admin_name }}</span>
+            <span class="name mr-1">{{
+              currentUser.name || tenantInfo.tenant_admin_name
+            }}</span>
             <span>
               <img :alt="currentUser.currentUser" src="/assets/img/pino.png" />
             </span>

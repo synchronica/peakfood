@@ -85,6 +85,9 @@ export const listMixin = {
       this.isLoad = false;
       this.moduleId = this.$route.params.id;
       this.$store.dispatch("getModuleManager", this.moduleId);
+      if (this.$route.params) {
+        this.loadItems(this.$route.params);
+      }
     },
     module() {
       if (this.initIsLoad && this.module) {
@@ -174,14 +177,14 @@ export const listMixin = {
       let formData = new FormData();
       formData.set("fields_manager", this.module.id);
 
-      if (paramQuery) {
-        formData.set("filters", "1");
-        for (const key in paramQuery) {
-          if (paramQuery.hasOwnProperty(key)) {
-            formData.set(key, paramQuery[key]);
-          }
-        }
-      }
+      // if (paramQuery) {
+      //   formData.set("filters", "1");
+      //   for (const key in paramQuery) {
+      //     if (paramQuery.hasOwnProperty(key)) {
+      //       formData.set(key, paramQuery[key]);
+      //     }
+      //   }
+      // }
 
       try {
         const fieldManagerResponse = await this.axios.post(
@@ -224,20 +227,27 @@ export const listMixin = {
       formData = new FormData();
       formData.set("data_provider", this.module.id);
 
+      let params = { data_provider: this.module.id };
+
+      if (paramQuery) {
+        params = Object.assign(params, paramQuery);
+        params.filters = 1;
+      }
+
       try {
-        const dataProviderResponse = await this.axios.post(
-          "/api/DataProvider",
-          formData
-        );
+        const dataProviderResponse = await this.axios.get("/api/DataProvider", {
+          params
+        });
         console.log("dataProviderResponse", dataProviderResponse);
         const dataProvider = dataProviderResponse.data.data;
         const { data } = dataProviderResponse;
         console.log("data", data);
 
-        if (!dataProvider) {
+        if (dataProvider === "") {
           const error = {
             message: "Empty"
           };
+          this.items = [];
           throw error;
         }
 
@@ -323,8 +333,9 @@ export const listMixin = {
     },
     async getSelectOptions(field, type) {
       let exist = this.filteredOptions.find(value => value === field);
+      let exist2 = this.selectOptions.find(value => value.label === field);
 
-      if (exist === undefined) {
+      if (exist === undefined && exist2 === undefined) {
         const formData = new FormData();
         formData.set("list_values", field);
 
@@ -334,7 +345,16 @@ export const listMixin = {
         this.filteredOptions.push(field);
 
         if (data) {
+          console.log("fielddata", data);
+
           data.forEach(option => {
+            let exist = this.selectOptions.find(
+              value => value.label === option[0].label
+            );
+            if (exist) {
+              throw exist;
+            }
+
             option.type = type;
 
             this.selectOptions.push(option[0]);
@@ -619,7 +639,10 @@ export const listMixin = {
         console.log(error);
       }
     },
-    linkGen(pageNum) {},
+    linkGen(pageNum) {
+      // this.loadItems(this.$route.params);
+      return pageNum === 1 ? "?" : `?page=${pageNum}`;
+    },
     changeAsc(asc) {
       if (this.isLoad) {
         this.ascValue = asc;
