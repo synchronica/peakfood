@@ -1,23 +1,24 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const webpack = require('webpack')
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");
 
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' ? '/dist' : '/',
+  publicPath: process.env.NODE_ENV === "production" ? "/" : "/",
   pages: {
     index: {
-      entry: 'src/index.js',
-      template: 'public/index.html',
-      filename: 'index.html'
+      entry: "src/index.js",
+      template: "public/index.html",
+      // filename: "index.blade.php"
+      filename: "index.html"
     }
   },
   devServer: {
     // clientLogLevel: 'warning',
     hot: true,
-    contentBase: 'dist',
+    contentBase: "dist",
     compress: true,
     open: true,
     overlay: { warnings: false, errors: true },
-    publicPath: '/',
+    publicPath: "/",
     quiet: true,
     watchOptions: {
       poll: false,
@@ -26,26 +27,26 @@ module.exports = {
   },
   chainWebpack: config => {
     config.module
-      .rule('vue')
-      .use('vue-loader')
-      .loader('vue-loader')
+      .rule("vue")
+      .use("vue-loader")
+      .loader("vue-loader")
       .tap(options => {
-        options.compilerOptions.preserveWhitespace = true
-        return options
-      })
+        options.compilerOptions.preserveWhitespace = true;
+        return options;
+      });
   },
   productionSourceMap: false,
-  assetsDir: './assets/',
+  assetsDir: "./assets/",
   configureWebpack: {
     plugins: [
       new webpack.ProvidePlugin({
-        'window.Quill': 'quill/dist/quill.js',
-        'Quill': 'quill/dist/quill.js'
+        "window.Quill": "quill/dist/quill.js",
+        Quill: "quill/dist/quill.js"
       }),
       new CopyWebpackPlugin([
-        { from: 'src/assets/img', to: 'assets/img' },
-        { from: 'src/assets/fonts', to: 'assets/fonts' }
+        { from: "src/assets/img", to: "assets/img" },
+        { from: "src/assets/fonts", to: "assets/fonts" }
       ])
     ]
   }
-}
+};
