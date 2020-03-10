@@ -174,7 +174,7 @@ export const store = new Vuex.Store({
       // console.log('rootState', rootState)
 
       rootState.axios
-        .post("/api/TenantInfo")
+        .get("/api/TenantInfo")
         .then(response => {
           console.log("tenantInfoResponse: ", response);
           const tenantInfo = response.data.data;
